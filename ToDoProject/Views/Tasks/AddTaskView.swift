@@ -9,7 +9,7 @@ struct AddTaskView: View {
     @State private var dueDate: Date = Date()
     @State private var selectedTypeIndex: Int = 0
 
-    // UI-only categories (you can rename/add)
+    
     private let taskTypes: [TaskType] = [
         TaskType(name: "School", icon: "graduationcap.fill"),
         TaskType(name: "Work", icon: "briefcase.fill"),
@@ -17,10 +17,19 @@ struct AddTaskView: View {
         TaskType(name: "Home", icon: "house.fill")
     ]
 
+    
+    private var selectedTaskType: TaskType {
+        guard taskTypes.indices.contains(selectedTypeIndex) else {
+            return taskTypes.first!
+        }
+        return taskTypes[selectedTypeIndex]
+    }
+
     var body: some View {
         AppBackground {
             VStack(spacing: 14) {
 
+                // Header
                 BrandCard {
                     VStack(alignment: .leading, spacing: 12) {
                         Text("New Task")
@@ -33,13 +42,16 @@ struct AddTaskView: View {
                     }
                 }
 
+                
                 BrandCard {
                     VStack(alignment: .leading, spacing: 14) {
 
+                        
                         VStack(alignment: .leading, spacing: 6) {
                             Text("Title")
                                 .font(.caption)
                                 .opacity(0.8)
+
                             TextField("e.g., Finish assignment", text: $title)
                                 .textInputAutocapitalization(.sentences)
                                 .padding(12)
@@ -47,10 +59,12 @@ struct AddTaskView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 14))
                         }
 
+                        
                         VStack(alignment: .leading, spacing: 6) {
                             Text("Notes")
                                 .font(.caption)
                                 .opacity(0.8)
+
                             TextField("Optional notes...", text: $notes, axis: .vertical)
                                 .lineLimit(3...6)
                                 .textInputAutocapitalization(.sentences)
@@ -59,6 +73,7 @@ struct AddTaskView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 14))
                         }
 
+                        
                         VStack(alignment: .leading, spacing: 6) {
                             Text("Due date")
                                 .font(.caption)
@@ -69,13 +84,13 @@ struct AddTaskView: View {
                                 selection: $dueDate,
                                 displayedComponents: [.date, .hourAndMinute]
                             )
-                            .datePickerStyle(.compact)
                             .labelsHidden()
                             .padding(12)
                             .background(Color.white.opacity(0.12))
                             .clipShape(RoundedRectangle(cornerRadius: 14))
                         }
 
+                        
                         VStack(alignment: .leading, spacing: 6) {
                             Text("Category")
                                 .font(.caption)
@@ -97,18 +112,24 @@ struct AddTaskView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 14))
                         }
 
-                        // Preview (nice UI feedback)
+                        
                         HStack(spacing: 10) {
-                            Image(systemName: taskTypes[selectedTypeIndex].icon)
+                            Image(systemName: selectedTaskType.icon)
                                 .font(.system(size: 18, weight: .semibold))
+
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(title.isEmpty ? "Task title preview" : title)
                                     .font(.headline)
                                     .lineLimit(1)
-                                Text(taskTypes[selectedTypeIndex].name + " • " + dueDate.formatted(date: .abbreviated, time: .shortened))
-                                    .font(.caption)
-                                    .opacity(0.8)
+
+                                Text(
+                                    selectedTaskType.name + " • " +
+                                    dueDate.formatted(date: .abbreviated, time: .shortened)
+                                )
+                                .font(.caption)
+                                .opacity(0.8)
                             }
+
                             Spacer()
                         }
                         .padding(12)
@@ -128,7 +149,6 @@ struct AddTaskView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 16))
 
                     Button("Create") {
-                        // UI-only: no saving, just close
                         dismiss()
                     }
                     .frame(maxWidth: .infinity)
@@ -143,8 +163,15 @@ struct AddTaskView: View {
             .padding(.horizontal, 16)
             .padding(.top, 10)
         }
+        .onAppear {
+            
+            if !taskTypes.indices.contains(selectedTypeIndex) {
+                selectedTypeIndex = 0
+            }
+        }
         .navigationTitle("Add Task")
         .navigationBarTitleDisplayMode(.inline)
     }
 }
+
 
