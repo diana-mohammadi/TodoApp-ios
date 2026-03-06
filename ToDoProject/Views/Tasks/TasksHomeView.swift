@@ -2,7 +2,7 @@ import SwiftUI
 
 struct TasksHomeView: View {
 
-    let tasks = MockData.tasks
+    @EnvironmentObject var session: AppSession
     @State private var showAddTask = false
 
     var body: some View {
@@ -25,7 +25,7 @@ struct TasksHomeView: View {
 
                         // Task list
                         VStack(spacing: 12) {
-                            ForEach(tasks) { task in
+                            ForEach(session.tasks) { task in
                                 TaskCard(task: task)
                             }
                         }
@@ -66,7 +66,5 @@ struct TasksHomeView: View {
         }
     }
 }
-
-
 
 
