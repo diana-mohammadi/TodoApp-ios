@@ -66,5 +66,3 @@ struct TasksHomeView: View {
         }
     }
 }
-
-
