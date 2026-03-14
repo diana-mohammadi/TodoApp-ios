@@ -5,18 +5,14 @@ import Combine
 final class AppSession: ObservableObject {
 
     @Published var isLoggedIn: Bool = false
-
-    // Regular splash screen control
     @Published var hasSeenSplash: Bool = false
 
-    // Current user
     @Published var currentUser: UserProfile = UserProfile(
         fullName: "Diana Mohammadi",
         username: "diana",
         email: "diana@example.com"
     )
 
-    // NEW: real in-memory task storage
     @Published var taskTypes: [TaskType] = MockData.taskTypes
     @Published var tasks: [TaskItem] = MockData.tasks
 
@@ -28,16 +24,8 @@ final class AppSession: ObservableObject {
         isLoggedIn = false
     }
 
-    // NEW: add task function
     func addTask(title: String, notes: String, dueDate: Date, type: TaskType) {
-        let status: TaskStatus
-
-        if dueDate < Date() {
-            status = .overdue
-        } else {
-            status = .dueSoon
-        }
-
+        let status: TaskStatus = dueDate < Date() ? .overdue : .dueSoon
         let newTask = TaskItem(
             title: title,
             notes: notes.isEmpty ? type.name : notes,
@@ -45,7 +33,24 @@ final class AppSession: ObservableObject {
             dueDate: dueDate,
             status: status
         )
-
         tasks.append(newTask)
+    }
+
+    func deleteTask(id: UUID) {
+        tasks.removeAll { $0.id == id }
+    }
+
+    func addType(name: String, icon: String) {
+        let newType = TaskType(name: name, icon: icon)
+        taskTypes.append(newType)
+    }
+
+    func deleteType(id: UUID) {
+        taskTypes.removeAll { $0.id == id }
+    }
+
+    func resetData() {
+        tasks = MockData.tasks
+        taskTypes = MockData.taskTypes
     }
 }

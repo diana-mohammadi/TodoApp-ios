@@ -12,7 +12,6 @@ struct TasksHomeView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
 
-                        // Header
                         VStack(alignment: .leading, spacing: 6) {
                             Text("Today")
                                 .font(.largeTitle.bold())
@@ -23,10 +22,35 @@ struct TasksHomeView: View {
                         }
                         .padding(.top, 12)
 
-                        // Task list
-                        VStack(spacing: 12) {
-                            ForEach(session.tasks) { task in
-                                TaskCard(task: task)
+                        if session.tasks.isEmpty {
+                            VStack(spacing: 14) {
+                                Spacer(minLength: 60)
+                                Image(systemName: "tray")
+                                    .font(.system(size: 48))
+                                    .opacity(0.5)
+                                Text("No tasks yet")
+                                    .font(.title3.weight(.semibold))
+                                    .opacity(0.7)
+                                Text("Tap + to add one")
+                                    .font(.subheadline)
+                                    .opacity(0.5)
+                            }
+                            .frame(maxWidth: .infinity)
+                        } else {
+                            VStack(spacing: 12) {
+                                ForEach(session.tasks) { task in
+                                    NavigationLink(destination: TasksDetailView(task: task)) {
+                                        TaskCard(task: task)
+                                    }
+                                    .buttonStyle(.plain)
+                                    .contextMenu {
+                                        Button(role: .destructive) {
+                                            session.deleteTask(id: task.id)
+                                        } label: {
+                                            Label("Delete", systemImage: "trash")
+                                        }
+                                    }
+                                }
                             }
                         }
 
@@ -35,7 +59,6 @@ struct TasksHomeView: View {
                     .padding(.horizontal)
                 }
 
-                // Floating + button
                 Button {
                     showAddTask = true
                 } label: {
