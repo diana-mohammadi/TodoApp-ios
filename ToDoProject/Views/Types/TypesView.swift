@@ -1,9 +1,17 @@
+//Diana Mohammadi
+//101481507
+
+// Added a delete confirmation alert when long-pressing a category.
+// Tracks which type is selected for deletion using typeToDelete state.
+// Calls session.deleteType() only after the user confirms.
 import SwiftUI
 
 struct TypesView: View {
 
     @EnvironmentObject var session: AppSession
     @State private var showAddType = false
+    @State private var typeToDelete: TaskType? = nil
+    @State private var showDeleteAlert = false
 
     private let columns = [
         GridItem(.flexible(), spacing: 12),
@@ -20,7 +28,6 @@ struct TypesView: View {
                         VStack(alignment: .leading, spacing: 6) {
                             Text("Categories")
                                 .font(.largeTitle.bold())
-
                             Text("Your task types")
                                 .font(.caption)
                                 .opacity(0.85)
@@ -47,7 +54,8 @@ struct TypesView: View {
                                     TypeCardView(type: type)
                                         .contextMenu {
                                             Button(role: .destructive) {
-                                                session.deleteType(id: type.id)
+                                                typeToDelete = type
+                                                showDeleteAlert = true
                                             } label: {
                                                 Label("Delete", systemImage: "trash")
                                             }
@@ -87,6 +95,14 @@ struct TypesView: View {
             .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $showAddType) {
                 AddTypesView()
+            }
+            .alert("Delete Category?", isPresented: $showDeleteAlert, presenting: typeToDelete) { type in
+                Button("Cancel", role: .cancel) {}
+                Button("Delete", role: .destructive) {
+                    session.deleteType(id: type.id)
+                }
+            } message: { type in
+                Text("This will permanently remove \"\(type.name)\". Tasks in this category won't be deleted.")
             }
         }
     }
