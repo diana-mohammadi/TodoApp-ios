@@ -1,3 +1,7 @@
+//Radin Madad Nezhad Aligorkeh
+//101474661
+// Added an Edit Task button that opens EditTaskView as a sheet.
+// Added a delete confirmation alert before removing a task.
 import SwiftUI
 
 struct TasksDetailView: View {
@@ -5,6 +9,9 @@ struct TasksDetailView: View {
     @EnvironmentObject var session: AppSession
     @Environment(\.dismiss) private var dismiss
     let task: TaskItem
+
+    @State private var showEditTask = false
+    @State private var showDeleteAlert = false
 
     var body: some View {
         AppBackground {
@@ -15,7 +22,6 @@ struct TasksDetailView: View {
                         VStack(alignment: .leading, spacing: 10) {
                             Text(task.title)
                                 .font(.title3.bold())
-
                             if !task.notes.isEmpty {
                                 Text(task.notes)
                                     .font(.subheadline)
@@ -32,7 +38,6 @@ struct TasksDetailView: View {
                                 Text(task.type.name)
                                     .font(.subheadline)
                             }
-
                             HStack(spacing: 10) {
                                 Image(systemName: "calendar")
                                     .font(.system(size: 18, weight: .semibold))
@@ -54,8 +59,23 @@ struct TasksDetailView: View {
                     Spacer(minLength: 20)
 
                     Button {
-                        session.deleteTask(id: task.id)
-                        dismiss()
+                        showEditTask = true
+                    } label: {
+                        HStack {
+                            Image(systemName: "pencil")
+                            Text("Edit Task")
+                        }
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(Color.white.opacity(0.22))
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                    }
+                    .padding(.horizontal, 16)
+
+                    Button {
+                        showDeleteAlert = true
                     } label: {
                         HStack {
                             Image(systemName: "trash")
@@ -69,10 +89,24 @@ struct TasksDetailView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                     }
                     .padding(.horizontal, 16)
+                    .alert("Delete Task?", isPresented: $showDeleteAlert) {
+                        Button("Cancel", role: .cancel) {}
+                        Button("Delete", role: .destructive) {
+                            session.deleteTask(id: task.id)
+                            dismiss()
+                        }
+                    } message: {
+                        Text("This will permanently remove \"\(task.title)\".")
+                    }
                 }
                 .padding(16)
             }
         }
         .navigationTitle("Task Details")
+        .sheet(isPresented: $showEditTask) {
+            NavigationStack {
+                EditTaskView(task: task)
+            }
+        }
     }
 }
