@@ -1,3 +1,7 @@
+//Arash Shalchian
+//101414035
+// Made the Edit Profile row a real NavigationLink to EditProfileView.
+// Added a Log Out button that calls session.logout() and clears in-memory data.
 import SwiftUI
 
 struct ProfileView: View {
@@ -39,8 +43,32 @@ struct ProfileView: View {
                         }
                     }
 
+                    NavigationLink(destination: EditProfileView()) {
+                        BrandCard {
+                            HStack {
+                                Image(systemName: "pencil")
+                                Text("Edit Profile")
+                                    .font(.headline)
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .opacity(0.5)
+                            }
+                        }
+                    }
+                    .buttonStyle(.plain)
+
                     BrandCard {
-                        Text("Edit profile")
+                        Button {
+                            session.logout()
+                        } label: {
+                            HStack {
+                                Image(systemName: "rectangle.portrait.and.arrow.right")
+                                Text("Log Out")
+                                    .font(.headline)
+                            }
+                            .foregroundColor(.red)
+                            .frame(maxWidth: .infinity)
+                        }
                     }
 
                     Spacer()
